@@ -1,0 +1,37 @@
+[
+  {
+    "artist": "Jason Derulo",
+    "url": "/sound/song1.mp3",
+    "name": "Acapulco",
+    "released": "2021",
+    "duration": 171
+  },
+  {
+    "artist": "Rema",
+    "url": "/sound/song2.mp3",
+    "name": "Calm Down",
+    "released": "2022",
+    "duration": 236
+  },
+  {
+    "artist": "Robert Grace",
+    "url": "/sound/song3.mp3",
+    "name": "Euphoria",
+    "released": "2024",
+    "duration": 185
+  },
+  {
+    "artist": "Martin Garrix",
+    "url": "/sound/song4.mp3",
+    "name": "So Far Away",
+    "released": "2010",
+    "duration": 184
+  },
+    {
+      "artist": "Robert Grace",
+      "url": "/sound/song5.mp3",
+      "name": "Casper",
+      "released": "2024",
+      "duration": 184
+    }
+]
