@@ -1,7 +1,37 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-hooks';
 import { usePlayer } from './usePlayer';
 
 describe('usePlayer', () => {
+	it('should ensure the format of provided audio files is correct', () => {
+		const audioArr = ['/sound/song4.jpg'];
+		act(() => {
+			audioArr.forEach((audioFile) => {
+				const howlerSupportedFormats = [
+					'mp3',
+					'mpeg',
+					'opus',
+					'ogg',
+					'oga',
+					'wav',
+					'aac',
+					'caf',
+					'm4a',
+					'mp4',
+					'weba',
+					'webm',
+					'dolby',
+					'flac',
+				];
+				const fileExtension = (audioFile.split('.').pop() || '').toLowerCase();
+				expect(() => {
+					if (!howlerSupportedFormats.includes(fileExtension)) {
+						throw new Error('The format of the audio file is not supported.');
+					}
+				}).toThrow('The format of the audio file is not supported.');
+			});
+		});
+	});
+
 	it('should toggle play and pause', () => {
 		const { result } = renderHook(() => usePlayer(['/sound/song1.mp3']));
 		act(() => {
