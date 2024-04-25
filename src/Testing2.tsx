@@ -1,6 +1,6 @@
 import { useSoundContext } from "./SoundContext";
 
-export const Testing1 = () => {
+export const Testing2 = () => {
 	const soundInstances = useSoundContext() || [];
 
 	const play = (index: number) => {
@@ -9,10 +9,10 @@ export const Testing1 = () => {
 	return (
 		<button
 			onClick={() => {
-				play(0);
+				play(1);
 			}}
 		>
-			Testing1
+			Testing2
 		</button>
 	);
 };

@@ -1,38 +1,19 @@
-// import { usePlayer } from './hooks/usePlayer';
-// import data from './data/data.json';
-import { useSound } from './hooks/useSound';
-import { Testing1 } from './Testing1';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Layout } from './pages/Layout';
+import { Blogs } from './pages/Blogs';
+import { Contact } from './pages/Contact';
+import { Home } from './pages/Home';
 
-function App() {
-	// const src = data.map((song) => song.url);
-	// const { togglePlay, stop, playNextTrack, playPreviousTrack, upVolume, downVolume, toggleLoop } =
-	// 	usePlayer(src);
-	const { pause, play, isPlaying } = useSound({ soundSrc: '/sound/song2.mp3' });
+export default function App() {
 	return (
-		<div className='flex gap-3 items-center justify-center'>
-			{/* <button onClick={togglePlay}>play</button>
-			<button onClick={stop}>stop</button>
-			<button onClick={playPreviousTrack}>prev</button>
-			<button onClick={playNextTrack}>next</button>
-			<button onClick={toggleLoop}>loop</button>
-			<div className='flex gap-2'>
-				<button onClick={upVolume}>+ Vol</button>
-				<button onClick={downVolume}>- Vol</button>
-			</div> */}
-			<button
-				onClick={() => {
-					if (isPlaying) {
-						pause();
-					} else {
-						play();
-					}
-				}}
-			>
-				song1
-			</button>
-			<Testing1 />
-		</div>
+		<BrowserRouter>
+			<Routes>
+				<Route path='/' element={<Layout />}>
+					<Route index element={<Home />} />
+					<Route path='blogs' element={<Blogs />} />
+					<Route path='contact' element={<Contact />} />
+				</Route>
+			</Routes>
+		</BrowserRouter>
 	);
 }
-
-export default App;

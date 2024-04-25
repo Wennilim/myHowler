@@ -27,14 +27,8 @@ const useClickSound = () => {
 		const clickSound = clickSoundRef.current;
 
 		if (clickSound) {
-			document.addEventListener(
-				'click',
-				() => {
-					clickSound.stop();
-					clickSound.play();
-				},
-				{ once: true }
-			);
+			clickSound.stop();
+			clickSound.play();
 		}
 	}, []);
 

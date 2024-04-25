@@ -1,70 +1,125 @@
 import { Howl, HowlOptions } from 'howler';
 import { useCallback, useEffect, useState } from 'react';
 
+export interface UseSoundReturn {
+	play: () => void;
+	stop: () => void;
+	pause: () => void;
+	isPlaying: boolean;
+}
+
 const useSound = ({
-	soundSrc,
+	soundSrcList,
 	pauseMode = false,
 	isLoop = false,
 	volume = 0.5,
 	options,
 }: {
-	soundSrc: string;
+	soundSrcList: string[];
 	pauseMode?: boolean;
 	isLoop?: boolean;
 	volume?: number;
 	options?: HowlOptions;
-}) => {
-	const [currentSound, setCurrentSound] = useState<Howl | null>(null);
-	const [isPlaying, setIsPlaying] = useState<boolean>(false);
+}): UseSoundReturn[] => {
+	const [sounds, setSounds] = useState<Array<Howl | null>>([]);
+	const [isPlayingList, setIsPlayingList] = useState<boolean[]>(
+		Array(soundSrcList.length).fill(false)
+	);
 
 	useEffect(() => {
-		const sound = new Howl({
-			src: [soundSrc],
-			loop: isLoop,
-			volume,
-			onplay: () => setIsPlaying(true),
-			onpause: () => setIsPlaying(false),
-			onend: () => setIsPlaying(false),
-			...options,
+		const loadedSounds = soundSrcList.map((src) => {
+			const sound = new Howl({
+				src: [src],
+				loop: isLoop,
+				volume,
+				onplay: () => {
+					const index = soundSrcList.indexOf(src);
+					if (index !== -1) {
+						const updatedIsPlayingList = [...isPlayingList];
+						updatedIsPlayingList[index] = true;
+						setIsPlayingList(updatedIsPlayingList);
+					}
+				},
+				onpause: () => {
+					const index = soundSrcList.indexOf(src);
+					if (index !== -1) {
+						const updatedIsPlayingList = [...isPlayingList];
+						updatedIsPlayingList[index] = false;
+						setIsPlayingList(updatedIsPlayingList);
+					}
+				},
+				onend: () => {
+					const index = soundSrcList.indexOf(src);
+					if (index !== -1) {
+						const updatedIsPlayingList = [...isPlayingList];
+						updatedIsPlayingList[index] = false;
+						setIsPlayingList(updatedIsPlayingList);
+					}
+				},
+				...options,
+			});
+			return sound;
 		});
 
-		setCurrentSound(sound);
+		setSounds(loadedSounds);
 
 		return () => {
-			sound.unload();
+			loadedSounds.forEach((sound) => sound.unload());
 		};
-	}, [soundSrc, isLoop, volume, options]);
+	}, [soundSrcList, isLoop, volume, options]);
 
-	const play = useCallback(() => {
-		if (pauseMode) {
-			if (currentSound) {
-				if (!isPlaying) {
-					currentSound.play();
-					setIsPlaying(true);
+	const play = useCallback(
+		(index: number) => {
+			if (pauseMode) {
+				const currentlyPlayingIndex = isPlayingList.findIndex((playing) => playing);
+				if (currentlyPlayingIndex !== -1 && currentlyPlayingIndex !== index) {
+					sounds[currentlyPlayingIndex]?.stop();
+					const updatedIsPlayingList = [...isPlayingList];
+					updatedIsPlayingList[currentlyPlayingIndex] = false;
+					setIsPlayingList(updatedIsPlayingList);
 				}
 			}
-		}
-		if (currentSound) {
-			currentSound.play();
-			setIsPlaying(true);
-		}
-	}, [currentSound]);
 
-	const stop = useCallback(() => {
-		if (currentSound) {
-			currentSound.stop();
-			setIsPlaying(false);
-		}
-	}, [currentSound]);
+			if (sounds[index]) {
+				sounds[index]?.play();
+				const updatedIsPlayingList = [...isPlayingList];
+				updatedIsPlayingList[index] = true;
+				setIsPlayingList(updatedIsPlayingList);
+			}
+		},
+		[pauseMode, sounds, isPlayingList]
+	);
 
-	const pause = useCallback(() => {
-		if (currentSound && isPlaying) {
-			currentSound.pause();
-			setIsPlaying(false);
-		}
-	}, [currentSound, isPlaying]);
+	const stop = useCallback(
+		(index: number) => {
+			if (sounds[index]) {
+				sounds[index]?.stop();
+				const updatedIsPlayingList = [...isPlayingList];
+				updatedIsPlayingList[index] = false;
+				setIsPlayingList(updatedIsPlayingList);
+			}
+		},
+		[sounds, isPlayingList]
+	);
 
-	return { play, stop, pause, isPlaying };
+	const pause = useCallback(
+		(index: number) => {
+			if (sounds[index] && isPlayingList[index]) {
+				sounds[index]?.pause();
+				const updatedIsPlayingList = [...isPlayingList];
+				updatedIsPlayingList[index] = false;
+				setIsPlayingList(updatedIsPlayingList);
+			}
+		},
+		[sounds, isPlayingList]
+	);
+
+	return soundSrcList.map((_, index) => ({
+		play: () => play(index),
+		stop: () => stop(index),
+		pause: () => pause(index),
+		isPlaying: isPlayingList[index],
+	}));
 };
 
-export { useSound };
+export default useSound;
